@@ -1,5 +1,8 @@
+// Gross hack for switching between contexts;
+var topPointer;
 BasicGame.Game = function (game) {
 
+    topPointer = this;
 	//	When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
 
     this.game;		//	a reference to the currently running game
@@ -42,6 +45,8 @@ BasicGame.Game.prototype = {
         this.player.anchor.setTo(0.5, 0.5); // Swivel around the middle
         this.game.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true; // Break space physics by bouncing off edge of universe (gasp!)
+        this.player.body.bounce.x = universeEdgeBounciness;
+        this.player.body.bounce.y = universeEdgeBounciness;
 
         // Create a group to hold all of our chickens!
 
@@ -66,11 +71,19 @@ BasicGame.Game.prototype = {
 
         this.player.rotation = this.game.physics.arcade.angleToPointer(this.player) - Math.PI/2; // Phaser recons angle from vertical, not from horizontal.
 
+        this.game.physics.arcade.overlap(chickens, chickens, coalesce, null, this);
+        this.game.physics.arcade.overlap(this.player, chickens, destroyPlayer);
+
         // Handle input
 
         if (this.game.input.activePointer.isDown) {
             // Emit chicken (most exciting thing in the entire game)!
             fire(this.player);
+        }
+
+        // Instantly reload chicken gun if cursor isn't down
+        if (this.game.input.activePointer.isUp) {
+            nextFire = this.game.time.now;
         }
 
 
