@@ -38,7 +38,7 @@ BasicGame.Game.prototype = {
 
 	create: function () {
 
-        this.game.world.setBounds(0,0,2960,1600)
+        this.game.world.setBounds(0,0,2560,1600)
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.add.sprite(0, 0, 'galaxy');
         
