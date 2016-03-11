@@ -69,6 +69,9 @@ BasicGame.Game.prototype = {
         // Enable inputs
         this.cursors = this.game.input.keyboard.createCursorKeys();
 
+        //Queue up music
+        this.music = this.add.audio('gameMusic');
+        this.music.play();
 	},
 
 	update: function () {
