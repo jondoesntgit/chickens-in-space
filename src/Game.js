@@ -30,13 +30,15 @@ BasicGame.Game.prototype = {
 
     preload: function() {
 
-        this.game.load.image('galaxy', 'assets/galaxy.jpg');
+        this.game.load.image('galaxy', 'assets/hubble.jpg');
+        // http://images.forwallpaper.com/files/images/2/2b73/2b737d44/152527/hubble-hubble-space-telescope-nasa-esa-view-star-forming-region-region-s-106-star-dust.jpg
         this.game.load.image('rocket', 'assets/rocket.png');
         this.game.load.image('chicken', 'assets/chicken.png', 24, 48);
     },
 
 	create: function () {
 
+        this.game.world.setBounds(0,0,2960,1600)
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.add.sprite(0, 0, 'galaxy');
         
@@ -48,12 +50,14 @@ BasicGame.Game.prototype = {
         this.player.body.bounce.x = universeEdgeBounciness;
         this.player.body.bounce.y = universeEdgeBounciness;
 
+        this.game.camera.follow(this.player)
+
         // Create a group to hold all of our chickens!
 
-        chickens = this.game.add.group();
-        chickens.enableBody = true; // It's no fun if the chickens don't interact with other matter!
+        this.chickens = this.game.add.group();
+        this.chickens.enableBody = true; // It's no fun if the chickens don't interact with other matter!
 
-        var chicken_little = chickens.create(70, 10, 'chicken');
+        var chicken_little = this.chickens.create(70, 10, 'chicken');
         var scaleFactor = chickenSize * Math.sqrt(chicken_little.body.mass);
         chicken_little.scale.setTo(scaleFactor, scaleFactor)
         chicken_little.body.velocity.x = -100;
@@ -71,8 +75,8 @@ BasicGame.Game.prototype = {
 
         this.player.rotation = this.game.physics.arcade.angleToPointer(this.player) - Math.PI/2; // Phaser recons angle from vertical, not from horizontal.
 
-        this.game.physics.arcade.overlap(chickens, chickens, coalesce, null, this);
-        this.game.physics.arcade.overlap(this.player, chickens, destroyPlayer);
+        this.game.physics.arcade.overlap(this.chickens, this.chickens, coalesce, null, this);
+        this.game.physics.arcade.overlap(this.player, this.chickens, destroyPlayer);
 
         // Handle input
 
@@ -86,8 +90,7 @@ BasicGame.Game.prototype = {
             nextFire = this.game.time.now;
         }
 
-
-
+        gravitate(this.chickens, this.chickens)
 	},
 
 	quitGame: function (pointer) {
