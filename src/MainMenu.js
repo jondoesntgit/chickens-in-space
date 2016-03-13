@@ -16,11 +16,12 @@ BasicGame.MainMenu.prototype = {
 
 		this.music = this.add.audio('titleMusic');
 		this.music.play();
-        width = window.innerWidth;
-        height = window.innerHeight;
+	        width = window.innerWidth;
+	        height = window.innerHeight;
 		this.add.sprite((width-640)/2, (height-400)/4, 'titlepage');
+			
 
-		this.playButton = this.add.button((width-40)/2, (height-400)/2+400, 'playButton', this.startGame, this, 'buttonOver', 'buttonOut', 'buttonOver');
+		this.playButton = this.add.button((width-40)/2, Math.min((height-400)/2+400, height-20), 'playButton', this.startGame, this, 'buttonOver', 'buttonOut', 'buttonOver');
 
 	},
 
