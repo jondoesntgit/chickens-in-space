@@ -68,10 +68,11 @@ BasicGame.Game.prototype = {
 
         // Enable inputs
         this.cursors = this.game.input.keyboard.createCursorKeys();
-
-        //Queue up music
-        this.music = this.add.audio('gameMusic');
-        this.music.play();
+        if (loadMusic) {
+            //Queue up music
+            this.music = this.add.audio('gameMusic');
+            this.music.play();
+        }
 	},
 
 	update: function () {
@@ -100,9 +101,10 @@ BasicGame.Game.prototype = {
 
 		//	Here you should destroy anything you no longer need.
 		//	Stop music, delete sprites, purge caches, free resources, all that good stuff.
-
-        this.music.stop();
-		//	Then's go back to the main menu.
+        if (loadMusic) {
+            this.music.stop();
+            //	Then's go back to the main menu.
+        }
 		this.state.start('MainMenu');
 
 	}

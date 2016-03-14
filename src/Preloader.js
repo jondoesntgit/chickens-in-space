@@ -18,6 +18,7 @@ BasicGame.Preloader.prototype = {
         height = window.innerHeight;
         width = window.innerWidth;
 
+
 		this.preloadBar = this.add.sprite((width-384)/2, (height-38)/2, 'preloaderBar');
 
 		//	This sets the preloadBar sprite as a loader sprite.
@@ -30,9 +31,11 @@ BasicGame.Preloader.prototype = {
 		this.load.image('titlepage', 'images/title.jpg');
 //		this.load.atlas('playButton', 'images/play_button.png', 'images/play_button.json'); 
         this.load.image('playButton', 'images/play.jpg');
-		//this.load.audio('titleMusic', ['audio/main_menu.mp3']);
-		this.load.audio('titleMusic', ['audio/Defense Line.mp3']);
-		this.load.audio('gameMusic', 'audio/Bobber Loop.wav', 0.5, true);
+
+        if (loadMusic) {
+            this.load.audio('titleMusic', ['audio/Defense Line.mp3']);
+            this.load.audio('gameMusic', 'audio/Bobber Loop.wav', 0.5, true);
+        }
 //		this.load.bitmapFont('caslon', 'fonts/caslon.png', 'fonts/caslon.xml');
 		//	+ lots of other required assets here
 
@@ -42,6 +45,11 @@ BasicGame.Preloader.prototype = {
 
 		//	Once the load has finished we disable the crop because we're going to sit in the update loop for a short while as the music decodes
 //		this.preloadBar.cropEnabled = false;
+//
+        if (!loadMusic) {
+            this.ready = true;
+			this.state.start('MainMenu');
+        }
 
 	},
 

@@ -1,5 +1,5 @@
 BasicGame = {
-
+    loadMusic : false,
     /* Here we've just got some global level vars that persist regardless of State swaps */
     score: 0,
 
@@ -57,13 +57,28 @@ BasicGame.Boot.prototype = {
         //  Here we load the assets required for our preloader (in this case a background and a loading bar)
 //        this.load.image('preloaderBackground', 'images/preloader_background.jpg');
         this.load.image('preloaderBar', 'images/preloader_bar.png');
+        this.load.image('noButton', 'images/no-80-40.png');
+        this.load.image('yesButton', 'images/yes-80-40.png');
+        this.load.image('musicSprite', 'images/music-80-40.png');
 
     },
 
     create: function () {
+       var topPointer = this;
+       var width = window.innerHeight;
+       var height = window.innerWidth;
+       yesButtonClick = function (){
+           loadMusic = true
+           topPointer.state.start('Preloader');
+       }
+       noButtonClick = function () {
+           loadMusic = false
+           topPointer.state.start('Preloader');
+       }
 
-        this.state.start('Preloader');
-
+       this.game.add.sprite((width-80)/2, height/4 - 50, 'musicSprite')
+       yesButton = this.game.add.button((width - 80 - 80)/2, height/4, 'yesButton', yesButtonClick, this)
+       noButton  = this.game.add.button((width - 80 + 80)/2, height/4, 'noButton', noButtonClick, this)
     },
 
     gameResized: function (width, height) {
