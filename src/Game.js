@@ -101,6 +101,7 @@ BasicGame.Game.prototype = {
 		//	Here you should destroy anything you no longer need.
 		//	Stop music, delete sprites, purge caches, free resources, all that good stuff.
 
+        this.music.stop();
 		//	Then's go back to the main menu.
 		this.state.start('MainMenu');
 

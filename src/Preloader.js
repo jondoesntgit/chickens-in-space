@@ -15,12 +15,15 @@ BasicGame.Preloader.prototype = {
 		//	These are the assets we loaded in Boot.js
 		//	A nice sparkly background and a loading progress bar
 //		this.background = this.add.sprite(0, 0, 'preloaderBackground');
-//		this.preloadBar = this.add.sprite(300, 400, 'preloaderBar');
+        height = window.innerHeight;
+        width = window.innerWidth;
+
+		this.preloadBar = this.add.sprite((width-384)/2, (height-38)/2, 'preloaderBar');
 
 		//	This sets the preloadBar sprite as a loader sprite.
 		//	What that does is automatically crop the sprite from 0 to full-width
 		//	as the files below are loaded in.
-//		this.load.setPreloadSprite(this.preloadBar);
+		this.load.setPreloadSprite(this.preloadBar);
 
 		//	Here we load the rest of the assets our game needs.
 		//	As this is just a Project Template I've not provided these assets, the lines below won't work as the files themselves will 404, they are just an example of use.
@@ -29,7 +32,7 @@ BasicGame.Preloader.prototype = {
         this.load.image('playButton', 'images/play.jpg');
 		//this.load.audio('titleMusic', ['audio/main_menu.mp3']);
 		this.load.audio('titleMusic', ['audio/Defense Line.mp3']);
-		this.load.audio('gameMusic', ['audio/Bobber Loop.wav']);
+		this.load.audio('gameMusic', 'audio/Bobber Loop.wav', 0.5, true);
 //		this.load.bitmapFont('caslon', 'fonts/caslon.png', 'fonts/caslon.xml');
 		//	+ lots of other required assets here
 
