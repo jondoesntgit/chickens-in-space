@@ -66,7 +66,16 @@ recoil = function (player) {
 
 }
 
+setupExplosion = function(explosion) {
+    explosion.anchor.x = .5;
+    explosion.anchor.y = .5;
+    explosion.animations.add('explode');
+}
+
 destroyPlayer = function (object1, object2) {
+    explosion = topPointer.explosions.getFirstExists(false);
+    explosion.reset(object1.x, object1.y)
+    explosion.play('explode', 10, false, true);
     object1.kill();
     object2.kill();
     topPointer.game.time.events.add(Phaser.Timer.SECOND * 3, quit, this);

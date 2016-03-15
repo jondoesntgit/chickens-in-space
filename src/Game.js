@@ -48,6 +48,14 @@ BasicGame.Game.prototype = {
 
         this.game.camera.follow(this.player)
 
+        // Setup explosions
+        this.explosions = this.game.add.group();
+        this.explosions.createMultiple(30, 'explode');
+        this.explosions.forEach(setupExplosion, this);
+        this.player.animations.add('explode');
+
+
+
 
         // Create a group to hold all of our chickens!
 

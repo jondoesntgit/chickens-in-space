@@ -37,7 +37,7 @@ BasicGame.Preloader.prototype = {
         this.game.load.image('chicken', 'assets/chicken.png', 24, 48);
         this.game.load.image('feather', 'images/feather.png', 24, 48);
         this.game.load.image('egg', 'images/egg.png', 24, 48);
-        this.game.load.spritesheet('explode', 'images/explode.png', 64, 64)
+        this.game.load.spritesheet('explode', 'images/explode.png', 128, 128)
 
         if (loadMusic) {
             this.load.audio('titleMusic', ['audio/Defense Line.mp3']);
