@@ -31,23 +31,33 @@ fire = function(player) {
 addStrain = function() {
     playerBody = topPointer.player.body;
     playerBody.strainAmplitudeGain = .1
+    topPointer.chickens.forEachAlive(function(chicken){
+        chicken.body.strainAmplitudeGain = .1
+    })
 }
 
 strainObjects = function() {
-    playerBody = topPointer.player.body;
-    playerBody.strainAmplitude += playerBody.strainAmplitudeGain;
-    if (playerBody.strainAmplitudeGain > 0) {
-        playerBody.strainAmplitudeGain -= .01
+    strainSingleObject(topPointer.player, playerSize);
+    topPointer.chickens.forEachAlive(function(chicken) {
+        strainSingleObject(chicken, chickenSize);
+    })
+}
+
+strainSingleObject = function(sprite, scale) {
+    body = sprite.body;
+    body.strainAmplitude += body.strainAmplitudeGain;
+    if (body.strainAmplitudeGain > 0) {
+        body.strainAmplitudeGain -= .01
     } else {
-        playerBody.strainAmplitudeGain = 0;
+        body.strainAmplitudeGain = 0;
     }
-    playerBody.strainAmplitude *= .99;
-    if (playerBody.strainAmplitude > maxStrain) playerBody.strainAmplitude = maxStrain;
+    body.strainAmplitude *= .99;
+    if (body.strainAmplitude > maxStrain) body.strainAmplitude = maxStrain;
 
     time = topPointer.game.time.now;
-    xstrain = playerSize * (1 + playerBody.strainAmplitude * Math.cos(playerBody.strainAngle + time/strainPeriod))
-    ystrain = playerSize * (1 - playerBody.strainAmplitude * Math.cos(playerBody.strainAngle + time/strainPeriod)); 
-    topPointer.player.scale.set(xstrain, ystrain)
+    xstrain = body.scaleFactor * (1 + body.strainAmplitude * Math.cos(body.strainAngle + time/strainPeriod))
+    ystrain = body.scaleFactor * (1 - body.strainAmplitude * Math.cos(body.strainAngle + time/strainPeriod)); 
+    sprite.scale.set(xstrain, ystrain)
 }
 
 createChicken = function(xpos, ypos, xvel, yvel) {
@@ -57,13 +67,18 @@ createChicken = function(xpos, ypos, xvel, yvel) {
 
     var chicken_little = topPointer.chickens.create(xpos, ypos, 'chicken');
     chicken_little.body.coreCollapse = 1;
-    var scaleFactor = chickenSize * Math.sqrt(chicken_little.body.mass) * chicken_little.body.coreCollapse;
-    chicken_little.scale.set(scaleFactor, scaleFactor)
+    chicken_little.body.scaleFactor = chickenSize * Math.sqrt(chicken_little.body.mass) * chicken_little.body.coreCollapse;
+    chicken_little.scale.set(chicken_little.body.scaleFactor, chicken_little.body.scaleFactor)
     chicken_little.body.velocity.x = xvel;
     chicken_little.body.velocity.y = yvel;
     chicken_little.body.bounce.x = universeEdgeBounciness;
     chicken_little.body.bounce.y = universeEdgeBounciness;
     chicken_little.body.collideWorldBounds = true; // Chickens should not leave the universe
+
+    // Gravitational wave stuff
+    chicken_little.body.strainAmplitudeGain = 0;
+    chicken_little.body.strainAmplitude = 0;
+    chicken_little.body.strainAngle = 2 * Math.random() * Math.PI;
 }
 
 createEgg = function(xpos, ypos, xvel, yvel) {
@@ -117,8 +132,8 @@ coalesce = function (body1, body2) {
       body1.body.velocity.x = (body1.body.mass * body1.body.velocity.x + body2.body.mass * body2.body.velocity.x) / (body1.body.mass + body2.body.mass)
       body1.body.velocity.y = (body1.body.mass * body1.body.velocity.y + body2.body.mass * body2.body.velocity.y) / (body1.body.mass + body2.body.mass)
       body1.body.mass = body1.body.mass + body2.body.mass
-      var scaleFactor = chickenSize * Math.sqrt(body1.body.mass) * body1.body.coreCollapse;
-      body1.scale.set(scaleFactor, scaleFactor)
+      body1.body.scaleFactor = chickenSize * Math.sqrt(body1.body.mass) * body1.body.coreCollapse;
+      body1.scale.set(body1.body.scaleFactor, body1.body.scaleFactor)
       body2.kill();
       addStrain();
   }

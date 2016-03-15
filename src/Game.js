@@ -45,6 +45,7 @@ BasicGame.Game.prototype = {
         this.player.body.collideWorldBounds = true; // Break space physics by bouncing off edge of universe (gasp!)
         this.player.body.bounce.x = universeEdgeBounciness;
         this.player.body.bounce.y = universeEdgeBounciness;
+        this.player.body.scaleFactor = playerSize;
         this.player.body.strainAmplitude = 0;
         this.player.body.strainAmplitudeGain = 0;
         this.player.body.strainAngle = 1;
