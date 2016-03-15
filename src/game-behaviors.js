@@ -3,6 +3,8 @@
 // A bunch of constants
 
 var chickenSize = 0.01; // How much should we scale default chickens?
+var featherSize = 0.04; // How much should we scale default chickens?
+var eggSize = 0.01; // How much should we scale default chickens?
 var universeEdgeBounciness = .8; //Allow the universe to 'cool' by objects hitting the edge
 var nextFire = 0; // Used to prevent 100Hz fire rate, limits to 1 chicken per second when holding mouse down. You can break physics, but not by that much.
 var fireRate = 400; // How many milliseconds between shots?
@@ -29,14 +31,32 @@ createChicken = function(xpos, ypos, xvel, yvel) {
     ypos = ypos -16;
 
     var chicken_little = topPointer.chickens.create(xpos, ypos, 'chicken');
-    var scaleFactor = chickenSize * Math.sqrt(chicken_little.body.mass);
+    chicken_little.body.coreCollapse = 1;
+    var scaleFactor = chickenSize * Math.sqrt(chicken_little.body.mass) * chicken_little.body.coreCollapse;
     chicken_little.scale.set(scaleFactor, scaleFactor)
-// TODO    chicken_little.anchor.setTo(0.5,0.5)
     chicken_little.body.velocity.x = xvel;
     chicken_little.body.velocity.y = yvel;
     chicken_little.body.bounce.x = universeEdgeBounciness;
     chicken_little.body.bounce.y = universeEdgeBounciness;
     chicken_little.body.collideWorldBounds = true; // Chickens should not leave the universe
+}
+
+createEgg = function(xpos, ypos, xvel, yvel) {
+    myEgg = topPointer.eggs.create(xpos, ypos, 'egg');
+    var scaleFactor = eggSize * Math.sqrt(myEgg.body.mass);
+    myEgg.scale.set(scaleFactor, scaleFactor);
+    myEgg.body.velocity.x = xvel;
+    myEgg.body.velocity.y = yvel;
+    myEgg.body.collideWorldBounds = false;
+}
+
+createFeather = function(xpos, ypos, xvel, yvel) {
+    myFeather = topPointer.feathers.create(xpos, ypos, 'feather');
+    var scaleFactor = featherSize * Math.sqrt(myFeather.body.mass);
+    myFeather.scale.set(scaleFactor, scaleFactor);
+    myFeather.body.velocity.x = xvel;
+    myFeather.body.velocity.y = yvel;
+    myFeather.body.collideWorldBounds = false;
 }
 
 recoil = function (player) {
@@ -63,33 +83,114 @@ coalesce = function (body1, body2) {
       body1.body.velocity.x = (body1.body.mass * body1.body.velocity.x + body2.body.mass * body2.body.velocity.x) / (body1.body.mass + body2.body.mass)
       body1.body.velocity.y = (body1.body.mass * body1.body.velocity.y + body2.body.mass * body2.body.velocity.y) / (body1.body.mass + body2.body.mass)
       body1.body.mass = body1.body.mass + body2.body.mass
-      var scaleFactor = chickenSize * Math.sqrt(body1.body.mass);
+      var scaleFactor = chickenSize * Math.sqrt(body1.body.mass) * body1.body.coreCollapse;
       body1.scale.set(scaleFactor, scaleFactor)
       body2.kill();
   }
 }
 
-gravitate = function(group1, group2) {
-    var game = topPointer.game;
-    group1.forEachAlive(function(chicken1) {
+coalesceBlackHoles = function (body1, blackHole) {
+    blackHole.body.mass = blackHole.body.mass + body1.body.mass;
+    body1.kill();
+}
+
+gravitatePlayer = function(player) {
+
+}
+
+gravitateEggs = function(eggs, chickens, blackHoles) {
+    eggs.forEachAlive(function(egg) {
         var acceleration = new Phaser.Point(0, 0);
-        group2.forEachAlive(function(chicken2) {
-            if (chicken1 != chicken2) {
-               var distance = Math.sqrt(Math.pow(chicken1.body.x - chicken2.body.x,2) + Math.pow(chicken1.body.y-chicken2.body.y,2));
-               var xaccel = gravitationalConstant * chicken2.body.mass / Math.pow(distance,3) * (chicken2.body.x - chicken1.body.x);
-               var yaccel = gravitationalConstant * chicken2.body.mass / Math.pow(distance,3) * (chicken2.body.y - chicken1.body.y);
+        blackHoles.forEachAlive(function(blackHole){
+            var distance = Math.sqrt(Math.pow(blackHole.body.x - egg.body.x,2) + Math.pow(blackHole.body.y-egg.body.y,2));
+            var xaccel = gravitationalConstant * egg.body.mass / Math.pow(distance,3) * (egg.body.x - blackHole.body.x);
+            var yaccel = gravitationalConstant * egg.body.mass / Math.pow(distance,3) * (egg.body.y - blackHole.body.y);
+            acceleration.x += xaccel
+            acceleration.y += yaccel
+        })
+        egg.body.acceleration = acceleration;
+    })
+}
+
+checkCoreCollapse = function(chickens) {
+    chickens.forEachAlive(function(chicken) {
+        if (chicken.body.mass > 10) {
+            // Core collapse!
+            if (chicken.body.coreCollapse >= .1) {
+                chicken.body.coreCollapse -= .01;
+                angle1 = Math.random() * 2 * Math.PI
+                angle2 = Math.random() * 2 * Math.PI
+                angle3 = Math.random() * 2 * Math.PI
+                angle4 = Math.random() * 2 * Math.PI
+                angle5 = Math.random() * 2 * Math.PI
+                createEgg(chicken.x, chicken.y, 100*Math.cos(angle1), 100*Math.sin(angle1));
+                createFeather(chicken.x, chicken.y, 200*Math.cos(angle2), 200*Math.sin(angle2));
+                createFeather(chicken.x, chicken.y, 200*Math.cos(angle3), 200*Math.sin(angle3));
+                createFeather(chicken.x, chicken.y, 200*Math.cos(angle4), 200*Math.sin(angle4));
+                createFeather(chicken.x, chicken.y, 200*Math.cos(angle5), 200*Math.sin(angle5));
+            } else {
+                // Become a black hole
+            }
+        }
+    })
+}
+
+gravitate = function(chickens, blackHoles) {
+    var game = topPointer.game;
+    try {
+        chickens.forEachAlive(function(chicken1) {
+            var acceleration = new Phaser.Point(0, 0);
+            chickens.forEachAlive(function(chicken2) {
+                if (chicken1 != chicken2) {
+                   var distance = Math.sqrt(Math.pow(chicken1.body.x - chicken2.body.x,2) + Math.pow(chicken1.body.y-chicken2.body.y,2));
+                   var xaccel = gravitationalConstant * chicken2.body.mass / Math.pow(distance,3) * (chicken2.body.x - chicken1.body.x);
+                   var yaccel = gravitationalConstant * chicken2.body.mass / Math.pow(distance,3) * (chicken2.body.y - chicken1.body.y);
+                   acceleration.x += xaccel
+                   acceleration.y += yaccel
+                }
+            })
+            blackHoles.forEachAlive(function(chicken2) {
+                if (chicken1 != chicken2) {
+                   var distance = Math.sqrt(Math.pow(chicken1.body.x - chicken2.body.x,2) + Math.pow(chicken1.body.y-chicken2.body.y,2));
+                   var xaccel = gravitationalConstant * chicken2.body.mass / Math.pow(distance,3) * (chicken2.body.x - chicken1.body.x);
+                   var yaccel = gravitationalConstant * chicken2.body.mass / Math.pow(distance,3) * (chicken2.body.y - chicken1.body.y);
+                   acceleration.x += xaccel
+                   acceleration.y += yaccel
+                }
+            })
+           var dragCoefficient = (1/(1+.00001*Phaser.Point.distance(acceleration, new Phaser.Point(0,0))))
+           chicken1.body.acceleration = acceleration;
+           chicken1.body.velocity.x *= dragCoefficient;
+           chicken1.body.velocity.y *= dragCoefficient;
+        })
+    } catch (err) {
+        console.log('Gravity problems');
+        console.log(group1)
+    }
+    blackHoles.forEachAlive(function(blackHole1) {
+        var acceleration = new Phaser.Point(0, 0);
+        blackHoles.forEachAlive(function(blackHole2) {
+            if (blackHole1 != blackHole2) {
+               var distance = Math.sqrt(Math.pow(blackHole1.body.x - blackHole2.body.x,2) + Math.pow(blackHole1.body.y-blackHole2.body.y,2));
+               var xaccel = gravitationalConstant * blackHole2.body.mass / Math.pow(distance,3) * (blackHole2.body.x - blackHole1.body.x);
+               var yaccel = gravitationalConstant * blackHole2.body.mass / Math.pow(distance,3) * (blackHole2.body.y - blackHole1.body.y);
                acceleration.x += xaccel
                acceleration.y += yaccel
-//               chicken1.body.velocity.x += xaccel;
-//               chicken1.body.velocity.y += yaccel;
+            }
+        })
+        blackHoles.forEachAlive(function(blackHole2) {
+            if (blackHole1 != blackHole2) {
+               var distance = Math.sqrt(Math.pow(blackHole1.body.x - blackHole2.body.x,2) + Math.pow(blackHole1.body.y-blackHole2.body.y,2));
+               var xaccel = gravitationalConstant * blackHole2.body.mass / Math.pow(distance,3) * (blackHole2.body.x - blackHole1.body.x);
+               var yaccel = gravitationalConstant * blackHole2.body.mass / Math.pow(distance,3) * (blackHole2.body.y - blackHole1.body.y);
+               acceleration.x += xaccel
+               acceleration.y += yaccel
             }
         })
        var dragCoefficient = (1/(1+.00001*Phaser.Point.distance(acceleration, new Phaser.Point(0,0))))
-       chicken1.body.acceleration = acceleration;
-           chicken1.body.velocity.x *= dragCoefficient;
-           chicken1.body.velocity.y *= dragCoefficient;
-     //   var dragVector = Phaser.Point.projectUnit(chicken1.body.velocity,acceleration);
-     //   chicken1.body.velocity.x = dragVector.x
-      //     chicken1.body.velocity.y = dragVector.y 
+       blackHole1.body.acceleration = acceleration;
+       blackHole1.body.velocity.x *= dragCoefficient;
+       blackHole1.body.velocity.y *= dragCoefficient;
     })
 }
+

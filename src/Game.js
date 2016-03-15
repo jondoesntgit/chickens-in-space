@@ -30,10 +30,6 @@ BasicGame.Game.prototype = {
 
     preload: function() {
 
-        this.game.load.image('galaxy', 'assets/hubble.jpg');
-        // http://images.forwallpaper.com/files/images/2/2b73/2b737d44/152527/hubble-hubble-space-telescope-nasa-esa-view-star-forming-region-region-s-106-star-dust.jpg
-        this.game.load.image('rocket', 'assets/rocket.png');
-        this.game.load.image('chicken', 'assets/chicken.png', 24, 48);
     },
 
 	create: function () {
@@ -52,19 +48,28 @@ BasicGame.Game.prototype = {
 
         this.game.camera.follow(this.player)
 
+
         // Create a group to hold all of our chickens!
 
         this.chickens = this.game.add.group();
         this.chickens.enableBody = true; // It's no fun if the chickens don't interact with other matter!
+        this.chickens.name = "chickens";
 
-        var chicken_little = this.chickens.create(70, 10, 'chicken');
-        var scaleFactor = chickenSize * Math.sqrt(chicken_little.body.mass);
-        chicken_little.scale.setTo(scaleFactor, scaleFactor)
-        chicken_little.body.velocity.x = -100;
-        chicken_little.body.velocity.y = -10;
-        chicken_little.body.bounce.x = universeEdgeBounciness;
-        chicken_little.body.bounce.y = universeEdgeBounciness;
-        chicken_little.body.collideWorldBounds = true; // Chickens should not leave the universe
+        // If chickens get too big they become blackholes!
+
+        this.blackHoles = this.game.add.group();
+        this.blackHoles.enableBody = true;
+        this.blackHoles.name = "blackHoles";
+
+        // Which spit out feathers and eggs!
+
+        this.eggs = this.game.add.group();
+        this.eggs.enableBody = true;
+        this.eggs.name = "eggs";
+
+        this.feathers = this.game.add.group();
+        this.feathers.enableBody = true;
+        this.feathers.name = "feathers";
 
         // Enable inputs
         this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -81,6 +86,10 @@ BasicGame.Game.prototype = {
 
         this.game.physics.arcade.overlap(this.chickens, this.chickens, coalesce, null, this);
         this.game.physics.arcade.overlap(this.player, this.chickens, destroyPlayer);
+        this.game.physics.arcade.overlap(this.player, this.blackHoles, destroyPlayer);
+        this.game.physics.arcade.overlap(this.chickens, this.blackHoles, coalesceBlackHoles);
+        this.game.physics.arcade.overlap(this.blackHoles, this.blackHoles, coalesceBlackHoles);
+        this.game.physics.arcade.overlap(this.player, this.eggs, destroyPlayer);
 
         // Handle input
 
@@ -94,7 +103,10 @@ BasicGame.Game.prototype = {
             nextFire = this.game.time.now;
         }
 
-        gravitate(this.chickens, this.chickens)
+        gravitate(this.chickens, this.blackHoles);
+        gravitatePlayer(this.player);
+        gravitateEggs(this.eggs, this.chickens, this.blackHoles);
+        checkCoreCollapse(this.chickens);
 	},
 
 	quitGame: function (pointer) {

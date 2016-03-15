@@ -65,8 +65,8 @@ BasicGame.Boot.prototype = {
 
     create: function () {
        var topPointer = this;
-       var width = window.innerHeight;
-       var height = window.innerWidth;
+       var height = window.innerHeight;
+       var width = window.innerWidth;
        yesButtonClick = function (){
            loadMusic = true
            topPointer.state.start('Preloader');
