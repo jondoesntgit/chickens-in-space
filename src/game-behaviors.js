@@ -5,7 +5,10 @@
 var chickenSize = 0.01; // How much should we scale default chickens?
 var featherSize = 0.04; // How much should we scale default chickens?
 var eggSize = 0.01; // How much should we scale default chickens?
+var playerSize = 0.05; // How big is the player
+var strainPeriod = 150; // How fast should the strain rotate
 var universeEdgeBounciness = .8; //Allow the universe to 'cool' by objects hitting the edge
+var maxStrain = .8; // Don't make the oscillations too big!
 var nextFire = 0; // Used to prevent 100Hz fire rate, limits to 1 chicken per second when holding mouse down. You can break physics, but not by that much.
 var fireRate = 400; // How many milliseconds between shots?
 var turretLength = 50; // How far away from ship anchor should a chicken be created? If it is too close, then it will create a collision upon creation
@@ -23,6 +26,28 @@ fire = function(player) {
         createChicken(xpos, ypos, xvel, yvel);
         recoil(player);
     }
+}
+
+addStrain = function() {
+    playerBody = topPointer.player.body;
+    playerBody.strainAmplitudeGain = .1
+}
+
+strainObjects = function() {
+    playerBody = topPointer.player.body;
+    playerBody.strainAmplitude += playerBody.strainAmplitudeGain;
+    if (playerBody.strainAmplitudeGain > 0) {
+        playerBody.strainAmplitudeGain -= .01
+    } else {
+        playerBody.strainAmplitudeGain = 0;
+    }
+    playerBody.strainAmplitude *= .99;
+    if (playerBody.strainAmplitude > maxStrain) playerBody.strainAmplitude = maxStrain;
+
+    time = topPointer.game.time.now;
+    xstrain = playerSize * (1 + playerBody.strainAmplitude * Math.cos(playerBody.strainAngle + time/strainPeriod))
+    ystrain = playerSize * (1 - playerBody.strainAmplitude * Math.cos(playerBody.strainAngle + time/strainPeriod)); 
+    topPointer.player.scale.set(xstrain, ystrain)
 }
 
 createChicken = function(xpos, ypos, xvel, yvel) {
@@ -95,6 +120,7 @@ coalesce = function (body1, body2) {
       var scaleFactor = chickenSize * Math.sqrt(body1.body.mass) * body1.body.coreCollapse;
       body1.scale.set(scaleFactor, scaleFactor)
       body2.kill();
+      addStrain();
   }
 }
 

@@ -39,12 +39,15 @@ BasicGame.Game.prototype = {
         this.game.add.sprite(0, 0, 'galaxy');
         
         this.player = this.game.add.sprite(this.game.world.width/2, this.game.world.height/2, 'rocket');
-        this.player.scale.set(.05, .05); // The sprite is really big
+        this.player.scale.set(playerSize, playerSize); // The sprite is really big
         this.player.anchor.setTo(0.5, 0.5); // Swivel around the middle
         this.game.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true; // Break space physics by bouncing off edge of universe (gasp!)
         this.player.body.bounce.x = universeEdgeBounciness;
         this.player.body.bounce.y = universeEdgeBounciness;
+        this.player.body.strainAmplitude = 0;
+        this.player.body.strainAmplitudeGain = 0;
+        this.player.body.strainAngle = 1;
 
         this.game.camera.follow(this.player)
 
@@ -98,6 +101,7 @@ BasicGame.Game.prototype = {
         this.game.physics.arcade.overlap(this.chickens, this.blackHoles, coalesceBlackHoles);
         this.game.physics.arcade.overlap(this.blackHoles, this.blackHoles, coalesceBlackHoles);
         this.game.physics.arcade.overlap(this.player, this.eggs, destroyPlayer);
+        strainObjects();
 
         // Handle input
 
