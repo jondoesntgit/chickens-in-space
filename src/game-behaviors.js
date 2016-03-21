@@ -12,10 +12,11 @@ var speedOfGraviton = 500;
 var maxStrain = .8; // Don't make the oscillations too big!
 var nextFire = 0; // Used to prevent 100Hz fire rate, limits to 1 chicken per second when holding mouse down. You can break physics, but not by that much.
 var fireRate = 400; // How many milliseconds between shots?
-var turretLength = 70; // How far away from ship anchor should a chicken be created? If it is too close, then it will create a collision upon creation
+var turretLength = 100; // How far away from ship anchor should a chicken be created? If it is too close, then it will create a collision upon creation
 var chickenImpulse = 100; // How hard does a chicken get shot out?
 var gravitationalConstant = 100000; // What is the pull between our chickens?
 var dragCoefficient = 1000; // Cause some drag when objects get really close to each other. GR!
+
 
 fire = function(player) {
     var xpos = player.body.x+player.width/2+Math.cos(player.rotation+Math.PI/2)*turretLength;
@@ -46,7 +47,6 @@ addStrain = function(collisionPoint, collisionStrength) {
 }
 
 addStrain2 = function(strainedObject, graviton) {
-    console.log('Add strain')
     strainedObject.body.strainAmplitudeGain = graviton.strength
 }
 
@@ -99,7 +99,6 @@ createChicken = function(xpos, ypos, xvel, yvel) {
     chicken_little.body.strainAmplitudeGain = 0;
     chicken_little.body.strainAmplitude = 0;
     chicken_little.body.strainAngle = 2 * Math.random() * Math.PI;
-    console.log(chicken_little.y)
 //    topPointer.chickens.add(chicken_little);
     /*
     */
@@ -112,6 +111,7 @@ createEgg = function(xpos, ypos, xvel, yvel) {
     myEgg.body.velocity.x = xvel;
     myEgg.body.velocity.y = yvel;
     myEgg.body.collideWorldBounds = false;
+    myEgg.name = "Egg";
     myEgg.events.onOutOfBounds.add(goodbye, this);
 }
 
@@ -123,6 +123,7 @@ createFeather = function(xpos, ypos, xvel, yvel) {
     myFeather.body.velocity.y = yvel;
     myFeather.body.collideWorldBounds = false;
     myFeather.events.onOutOfBounds.add(goodbye, this);
+    myFeather.ripe = 10
 }
 
 createGraviton = function(passedStrength, xpos, ypos, xvel, yvel) {
@@ -137,7 +138,6 @@ createGraviton = function(passedStrength, xpos, ypos, xvel, yvel) {
 }
 
 goodbye = function (object) {
-    console.log('Killed object');
     object.kill();
 }
 
@@ -155,6 +155,7 @@ setupExplosion = function(explosion) {
 }
 
 destroyPlayer = function (object1, object2) {
+    console.log(object2)
     explosion = topPointer.explosions.getFirstExists(false);
     explosion.reset(object1.x, object1.y)
     explosion.play('explode', 10, false, true);
@@ -165,12 +166,17 @@ destroyPlayer = function (object1, object2) {
 
 quit = function () {
     topPointer.state.start('MainMenu');
+    if (loadMusic) {
+        topPointer.music.stop()
+    }
 }
 
 
 // Combine two objects
 coalesce = function (body1, body2) {
   if (body1 != body2) {
+      console.log(body1)
+      console.log(body2)
       body1.body.velocity.x = (body1.body.mass * body1.body.velocity.x + body2.body.mass * body2.body.velocity.x) / (body1.body.mass + body2.body.mass)
       body1.body.velocity.y = (body1.body.mass * body1.body.velocity.y + body2.body.mass * body2.body.velocity.y) / (body1.body.mass + body2.body.mass)
       body1.body.mass = body1.body.mass + body2.body.mass
@@ -179,21 +185,20 @@ coalesce = function (body1, body2) {
       body2.kill();
       collisionPoint = new Phaser.Point(body1.x, body1.y)
       collisionStrength = 10000
-      console.log('Collision at '+ body1.x)
       for (i = 0; i < 40; i++) {
           angle1 = Math.random() * 2 * Math.PI;
           createGraviton(Math.sqrt(body1.body.mass)/100, body1.x-128, body1.y-128, speedOfGraviton*Math.cos(angle1), speedOfGraviton*Math.sin(angle1));
       }
-                angle1 = Math.random() * 2 * Math.PI
-                angle2 = Math.random() * 2 * Math.PI
-                angle3 = Math.random() * 2 * Math.PI
-                angle4 = Math.random() * 2 * Math.PI
-                angle5 = Math.random() * 2 * Math.PI
-                createEgg(body1.x, body1.y, 100*Math.cos(angle1), 100*Math.sin(angle1));
-                createFeather(body1.x, body1.y, 200*Math.cos(angle2), 200*Math.sin(angle2));
-                createFeather(body1.x, body1.y, 200*Math.cos(angle3), 200*Math.sin(angle3));
-                createFeather(body1.x, body1.y, 200*Math.cos(angle4), 200*Math.sin(angle4));
-                createFeather(body1.x, body1.y, 200*Math.cos(angle5), 200*Math.sin(angle5));
+      angle1 = Math.random() * 2 * Math.PI
+      angle2 = Math.random() * 2 * Math.PI
+      angle3 = Math.random() * 2 * Math.PI
+      angle4 = Math.random() * 2 * Math.PI
+      angle5 = Math.random() * 2 * Math.PI
+//              createEgg(body1.x, body1.y, 100*Math.cos(angle1), 100*Math.sin(angle1));
+      createFeather(body1.x, body1.y, 200*Math.cos(angle2), 200*Math.sin(angle2));
+      createFeather(body1.x, body1.y, 200*Math.cos(angle3), 200*Math.sin(angle3));
+      createFeather(body1.x, body1.y, 200*Math.cos(angle4), 200*Math.sin(angle4));
+      createFeather(body1.x, body1.y, 200*Math.cos(angle5), 200*Math.sin(angle5));
       //addStrain(collisionPoint, collisionStrength);
   }
 }
@@ -205,6 +210,16 @@ coalesceBlackHoles = function (body1, blackHole) {
 
 gravitatePlayer = function(player) {
 
+}
+
+ripenFeathers = function() {
+    feathers = topPointer.feathers;
+    feathers.forEachAlive(function(feather){
+        if (feather.ripe > 0) {
+            feather.ripe = feather.ripe - 1
+        console.log(feather.ripe)
+        }
+    })
 }
 
 gravitateEggs = function(eggs, chickens, blackHoles) {
@@ -242,6 +257,17 @@ checkCoreCollapse = function(chickens) {
             }
         }
     })
+}
+
+collectFeather = function(player, feather) {
+    if (feather.ripe <= 0) {
+        topPointer.score += 10;
+        if (loadMusic) {
+            topPointer.collectCoin.play()
+
+        }
+        feather.kill()
+    }
 }
 
 gravitate = function(chickens, blackHoles) {

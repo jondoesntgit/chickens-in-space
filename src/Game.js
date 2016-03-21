@@ -2,6 +2,7 @@
 var topPointer;
 BasicGame.Game = function (game) {
 
+var timer
     topPointer = this;
 	//	When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
 
@@ -21,6 +22,8 @@ BasicGame.Game = function (game) {
     this.physics;	//	the physics manager
     this.rnd;		//	the repeatable random number generator
 
+    this.score = 0;
+
     //	You can use any of these from any function within this State.
     //	But do consider them as being 'reserved words', i.e. don't create a property for your own game called "world" or you'll over-write the world reference.
 
@@ -34,6 +37,7 @@ BasicGame.Game.prototype = {
 
 	create: function () {
 
+        this.score = 0;
         this.game.world.setBounds(0,0,2560,1600)
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.setBoundsToWorld();
@@ -58,7 +62,10 @@ BasicGame.Game.prototype = {
         this.explosions.createMultiple(30, 'explode');
         this.explosions.forEach(setupExplosion, this);
         this.player.animations.add('explode');
+                timer = this.game.time.create();
+        timerEvent = timer.add(Phaser.Timer.MINUTE * 2 + Phaser.Timer.SECOND * 5, this.endTimer, this);
 
+        timer.start();
 
 
 
@@ -97,8 +104,9 @@ BasicGame.Game.prototype = {
         this.cursors = this.game.input.keyboard.createCursorKeys();
         if (loadMusic) {
             //Queue up music
-            this.music = this.add.audio('gameMusic');
+            this.music = this.add.audio('titleMusic');
             this.music.play();
+            this.collectCoin = this.add.audio('collectCoin');
         }
 	},
 
@@ -112,9 +120,19 @@ BasicGame.Game.prototype = {
         this.game.physics.arcade.overlap(this.chickens, this.blackHoles, coalesceBlackHoles);
         this.game.physics.arcade.overlap(this.blackHoles, this.blackHoles, coalesceBlackHoles);
         this.game.physics.arcade.overlap(this.player, this.gravitons, addStrain2);
+        this.game.physics.arcade.overlap(this.player, this.feathers, collectFeather);
         this.game.physics.arcade.overlap(this.chickens, this.gravitons, addStrain2);
         this.game.physics.arcade.overlap(this.player, this.eggs, destroyPlayer);
+        ripenFeathers()
         strainObjects();
+
+        this.game.debug.text('Score: ' + this.score, 20, 20)
+if (timer.running) {
+            this.game.debug.text("Time Remaining: " +(this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000))), 20, 40);
+        }
+        else {
+            game.debug.text("Done!", 20, 40, "#0f0");
+        }
 
         // Handle input
 
@@ -133,6 +151,22 @@ BasicGame.Game.prototype = {
         gravitateEggs(this.eggs, this.chickens, this.blackHoles);
         checkCoreCollapse(this.chickens);
 	},
+
+    formatTime: function(s) {
+        // Convert seconds (s) to a nicely formatted and padded time string
+        var minutes = "0" + Math.floor(s / 60);
+        var seconds = "0" + (s - minutes * 60);
+        return minutes.substr(-2) + ":" + seconds.substr(-2);   
+    },
+
+    render : function() {
+
+
+     },
+
+    endTimer: function() {
+timer.stop()
+},
 
 	quitGame: function (pointer) {
 

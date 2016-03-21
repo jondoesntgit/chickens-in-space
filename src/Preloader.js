@@ -43,6 +43,7 @@ BasicGame.Preloader.prototype = {
         if (loadMusic) {
             this.load.audio('titleMusic', ['audio/Defense Line.mp3']);
             this.load.audio('gameMusic', 'audio/Bobber Loop.wav', 0.5, true);
+            this.load.audio('collectCoin', 'audio/collect-coin.mp3', 0.5);
         }
 //		this.load.bitmapFont('caslon', 'fonts/caslon.png', 'fonts/caslon.xml');
 		//	+ lots of other required assets here
