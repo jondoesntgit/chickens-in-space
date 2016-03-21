@@ -36,7 +36,7 @@ BasicGame.Preloader.prototype = {
         this.game.load.image('galaxy', 'assets/hubble.jpg');
         // http://images.forwallpaper.com/files/images/2/2b73/2b737d44/152527/hubble-hubble-space-telescope-nasa-esa-view-star-forming-region-region-s-106-star-dust.jpg
         this.game.load.image('rocket', 'assets/rocket.png');
-        this.game.load.image('chicken', 'assets/chicken.png');
+        this.game.load.image('chicken', 'images/chicken.png');
         this.game.load.image('feather', 'images/feather.png');
         this.game.load.image('graviton', 'images/graviton.png');
         this.game.load.image('egg', 'images/egg.png');

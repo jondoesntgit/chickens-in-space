@@ -75,6 +75,15 @@ BasicGame.Game.prototype = {
         this.chickens.enableBody = true; // It's no fun if the chickens don't interact with other matter!
 //        this.chickens.position.setTo(this.game.world.width,this.game.world.height)
 //        this.chickens.position.setTo(0, 0)
+        // Which spit out feathers and eggs!
+
+
+        this.feathers = this.game.add.group();
+        this.feathers.enableBody = true;
+        this.feathers.name = "feathers";
+        this.eggs = this.game.add.group();
+        this.eggs.enableBody = true;
+        this.eggs.name = "eggs";
         this.chickens.x = 0
         this.chickens.y = 0
         this.chickens.name = "chickens";
@@ -85,20 +94,12 @@ BasicGame.Game.prototype = {
         this.blackHoles.enableBody = true;
         this.blackHoles.name = "blackHoles";
 
-        // Which spit out feathers and eggs!
-
-        this.eggs = this.game.add.group();
-        this.eggs.enableBody = true;
-        this.eggs.name = "eggs";
-
-        this.feathers = this.game.add.group();
-        this.feathers.enableBody = true;
-        this.feathers.name = "feathers";
 
         this.gravitons = this.game.add.group();
         this.gravitons.enableBody = true;
         this.gravitons.physicsBodyType = Phaser.Physics.ARCADE;
         this.gravitons.name = "gravitons";
+        this.game.world.bringToTop(this.chickens);
 
         // Enable inputs
         this.cursors = this.game.input.keyboard.createCursorKeys();

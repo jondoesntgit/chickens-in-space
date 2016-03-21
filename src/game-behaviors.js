@@ -2,9 +2,9 @@
 
 // A bunch of constants
 
-var chickenSize = 0.01; // How much should we scale default chickens?
-var featherSize = 0.04; // How much should we scale default chickens?
-var eggSize = 0.01; // How much should we scale default chickens?
+var chickenSize = 0.1; // How much should we scale default chickens?
+var featherSize = 0.08; // How much should we scale default chickens?
+var eggSize = 0.1 // How much should we scale default chickens?
 var playerSize = 0.05; // How big is the player
 var strainPeriod = 150; // How fast should the strain rotate
 var universeEdgeBounciness = .8; //Allow the universe to 'cool' by objects hitting the edge
@@ -15,7 +15,7 @@ var fireRate = 400; // How many milliseconds between shots?
 var turretLength = 100; // How far away from ship anchor should a chicken be created? If it is too close, then it will create a collision upon creation
 var chickenImpulse = 100; // How hard does a chicken get shot out?
 var gravitationalConstant = 300000; // What is the pull between our chickens?
-var dragCoefficient = 1000; // Cause some drag when objects get really close to each other. GR!
+var dragCoefficient = 100; // Cause some drag when objects get really close to each other. GR!
 
 
 fire = function(player) {
@@ -86,6 +86,7 @@ createChicken = function(xpos, ypos, xvel, yvel) {
 //    chicken_little.anchor.setTo(0.5, 0.5);// = .5;
     topPointer.game.physics.arcade.enable(chicken_little);
     chicken_little.body.coreCollapse = 1;
+    chicken_little.body.maxVelocity = 100
     chicken_little.moves = false;
     chicken_little.body.scaleFactor = chickenSize * Math.sqrt(chicken_little.body.mass) * chicken_little.body.coreCollapse;
     chicken_little.scale.set(chicken_little.body.scaleFactor, chicken_little.body.scaleFactor)
@@ -133,7 +134,7 @@ createGraviton = function(passedStrength, xpos, ypos, xvel, yvel) {
     myGraviton.body.velocity.y = yvel;
     myGraviton.body.collideWorldBounds = false;
     myGraviton.strength = passedStrength;
-    myGraviton.alpha = 0
+    myGraviton.alpha = 0.1;
     myGraviton.checkWorldBounds = true;
     myGraviton.events.onOutOfBounds.add(goodbye, this);
 }
@@ -200,9 +201,11 @@ coalesce = function (body1, body2) {
       angle1 = Math.random() * 2 * Math.PI
       createFeather(body1.x, body1.y, 200*Math.cos(angle1), 200*Math.sin(angle1));
       }
-      for (i = 0; i < Math.sqrt(body1.body.mass); i++) {
+      for (i = 0; i < Math.sqrt(body1.body.mass)/2; i++) {
           angle1 = Math.random() * 2 * Math.PI
-          createEgg(body1.x, body1.y, 100*Math.cos(angle1), 100*Math.sin(angle1));
+          if (body1.body.mass < 20) {
+              createEgg(body1.x, body1.y, 100*Math.cos(angle1), 100*Math.sin(angle1));
+          }
       }
       //addStrain(collisionPoint, collisionStrength);
   }
