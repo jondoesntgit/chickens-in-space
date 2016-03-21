@@ -29,8 +29,10 @@ BasicGame.Preloader.prototype = {
 		//	Here we load the rest of the assets our game needs.
 		//	As this is just a Project Template I've not provided these assets, the lines below won't work as the files themselves will 404, they are just an example of use.
 		this.load.image('titlepage', 'images/title.jpg');
+		this.load.image('instructions', 'images/instructions.png');
 //		this.load.atlas('playButton', 'images/play_button.png', 'images/play_button.json'); 
         this.load.image('playButton', 'images/play.jpg');
+        this.load.image('instructionsButton', 'images/instructions-button.png');
         this.game.load.image('galaxy', 'assets/hubble.jpg');
         // http://images.forwallpaper.com/files/images/2/2b73/2b737d44/152527/hubble-hubble-space-telescope-nasa-esa-view-star-forming-region-region-s-106-star-dust.jpg
         this.game.load.image('rocket', 'assets/rocket.png');

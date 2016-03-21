@@ -277,6 +277,7 @@ checkCoreCollapse = function(chickens) {
             // Core collapse!
             if (chicken.body.coreCollapse >= .1) {
                 chicken.body.coreCollapse -= .01;
+                chicken.body.scaleFactor = chickenSize * Math.sqrt(chicken.body.mass) * chicken.body.coreCollapse;
                 angle1 = Math.random() * 2 * Math.PI
                 angle2 = Math.random() * 2 * Math.PI
                 angle3 = Math.random() * 2 * Math.PI
