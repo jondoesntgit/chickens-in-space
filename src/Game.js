@@ -165,7 +165,7 @@ if (timer.running) {
      },
 
     endTimer: function() {
-timer.stop()
+    quit()
 },
 
 	quitGame: function (pointer) {
