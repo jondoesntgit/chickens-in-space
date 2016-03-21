@@ -36,6 +36,7 @@
     <script src="src/game-behaviors.js"></script>
 	<script src="src/Boot.js"></script>
 	<script src="src/Preloader.js"></script>
+	<script src="src/Instructions.js"></script>
 	<script src="src/MainMenu.js"></script>
     <script src="src/Game.js"></script> 
     <!--	<script src="cis-game.js"></script> -->
@@ -63,6 +64,7 @@
 	game.state.add('Preloader', BasicGame.Preloader);
 	game.state.add('MainMenu', BasicGame.MainMenu);
 	game.state.add('Game', BasicGame.Game);
+	game.state.add('Instructions', BasicGame.Instructions);
 
 	//	Now start the Boot state.
 	game.state.start('Boot');
