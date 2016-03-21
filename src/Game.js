@@ -36,6 +36,7 @@ BasicGame.Game.prototype = {
 
         this.game.world.setBounds(0,0,2560,1600)
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        this.game.physics.setBoundsToWorld();
         this.game.add.sprite(0, 0, 'galaxy');
         
         this.player = this.game.add.sprite(this.game.world.width/2, this.game.world.height/2, 'rocket');
@@ -65,6 +66,10 @@ BasicGame.Game.prototype = {
 
         this.chickens = this.game.add.group();
         this.chickens.enableBody = true; // It's no fun if the chickens don't interact with other matter!
+//        this.chickens.position.setTo(this.game.world.width,this.game.world.height)
+//        this.chickens.position.setTo(0, 0)
+        this.chickens.x = 0
+        this.chickens.y = 0
         this.chickens.name = "chickens";
 
         // If chickens get too big they become blackholes!
@@ -82,6 +87,11 @@ BasicGame.Game.prototype = {
         this.feathers = this.game.add.group();
         this.feathers.enableBody = true;
         this.feathers.name = "feathers";
+
+        this.gravitons = this.game.add.group();
+        this.gravitons.enableBody = true;
+        this.gravitons.physicsBodyType = Phaser.Physics.ARCADE;
+        this.gravitons.name = "gravitons";
 
         // Enable inputs
         this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -101,6 +111,8 @@ BasicGame.Game.prototype = {
         this.game.physics.arcade.overlap(this.player, this.blackHoles, destroyPlayer);
         this.game.physics.arcade.overlap(this.chickens, this.blackHoles, coalesceBlackHoles);
         this.game.physics.arcade.overlap(this.blackHoles, this.blackHoles, coalesceBlackHoles);
+        this.game.physics.arcade.overlap(this.player, this.gravitons, addStrain2);
+        this.game.physics.arcade.overlap(this.chickens, this.gravitons, addStrain2);
         this.game.physics.arcade.overlap(this.player, this.eggs, destroyPlayer);
         strainObjects();
 

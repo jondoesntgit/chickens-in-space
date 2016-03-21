@@ -8,10 +8,11 @@ var eggSize = 0.01; // How much should we scale default chickens?
 var playerSize = 0.05; // How big is the player
 var strainPeriod = 150; // How fast should the strain rotate
 var universeEdgeBounciness = .8; //Allow the universe to 'cool' by objects hitting the edge
+var speedOfGraviton = 500;
 var maxStrain = .8; // Don't make the oscillations too big!
 var nextFire = 0; // Used to prevent 100Hz fire rate, limits to 1 chicken per second when holding mouse down. You can break physics, but not by that much.
 var fireRate = 400; // How many milliseconds between shots?
-var turretLength = 50; // How far away from ship anchor should a chicken be created? If it is too close, then it will create a collision upon creation
+var turretLength = 70; // How far away from ship anchor should a chicken be created? If it is too close, then it will create a collision upon creation
 var chickenImpulse = 100; // How hard does a chicken get shot out?
 var gravitationalConstant = 100000; // What is the pull between our chickens?
 var dragCoefficient = 1000; // Cause some drag when objects get really close to each other. GR!
@@ -28,12 +29,25 @@ fire = function(player) {
     }
 }
 
-addStrain = function() {
+addStrain = function(collisionPoint, collisionStrength) {
     playerBody = topPointer.player.body;
-    playerBody.strainAmplitudeGain = .1
+    distanceSquared = Math.pow(collisionPoint.x - playerBody.x,2) + Math.pow(collisionPoint.y - playerBody.y,2);
+    timeOffset = Math.sqrt(distanceSquared) / speedOfGraviton
+//    topPointer.game.time.events.add(Phaser.Timer.SECOND * timeOffset, function() {
+        playerBody.strainAmplitudeGain = collisionStrength / distanceSquared
+ //   }, this);
     topPointer.chickens.forEachAlive(function(chicken){
-        chicken.body.strainAmplitudeGain = .1
+        distanceSquared = Math.pow(collisionPoint.x - chicken.body.x,2) + Math.pow(collisionPoint.y - chicken.body.y,2);
+        timeOffset = Math.sqrt(distanceSquared) / speedOfGraviton
+  //      topPointer.game.time.events.add(Phaser.Timer.SECOND * timeOffset, function() {
+            chicken.body.strainAmplitudeGain = collisionStrength / distanceSquared
+   //     }, this);
     })
+}
+
+addStrain2 = function(strainedObject, graviton) {
+    console.log('Add strain')
+    strainedObject.body.strainAmplitudeGain = graviton.strength
 }
 
 strainObjects = function() {
@@ -61,12 +75,18 @@ strainSingleObject = function(sprite, scale) {
 }
 
 createChicken = function(xpos, ypos, xvel, yvel) {
-    // Need to adjust anchor
-    xpos = xpos -16;
-    ypos = ypos -16;
-
+    xpos = xpos - 16
+    ypos = ypos - 16
+//   xpos = 1000 + xpos
+//       ypos = 1000  + ypos
+//    var chicken_little = topPointer.game.add.sprite(xpos, ypos, 'chicken');
     var chicken_little = topPointer.chickens.create(xpos, ypos, 'chicken');
+//    var chicken_little = topPointer.chickens.create(xpos, ypos, 'chicken');
+//    chicken_little.deadly = false;
+//    chicken_little.anchor.setTo(0.5, 0.5);// = .5;
+    topPointer.game.physics.arcade.enable(chicken_little);
     chicken_little.body.coreCollapse = 1;
+    chicken_little.moves = false;
     chicken_little.body.scaleFactor = chickenSize * Math.sqrt(chicken_little.body.mass) * chicken_little.body.coreCollapse;
     chicken_little.scale.set(chicken_little.body.scaleFactor, chicken_little.body.scaleFactor)
     chicken_little.body.velocity.x = xvel;
@@ -79,6 +99,10 @@ createChicken = function(xpos, ypos, xvel, yvel) {
     chicken_little.body.strainAmplitudeGain = 0;
     chicken_little.body.strainAmplitude = 0;
     chicken_little.body.strainAngle = 2 * Math.random() * Math.PI;
+    console.log(chicken_little.y)
+//    topPointer.chickens.add(chicken_little);
+    /*
+    */
 }
 
 createEgg = function(xpos, ypos, xvel, yvel) {
@@ -88,6 +112,7 @@ createEgg = function(xpos, ypos, xvel, yvel) {
     myEgg.body.velocity.x = xvel;
     myEgg.body.velocity.y = yvel;
     myEgg.body.collideWorldBounds = false;
+    myEgg.events.onOutOfBounds.add(goodbye, this);
 }
 
 createFeather = function(xpos, ypos, xvel, yvel) {
@@ -97,6 +122,23 @@ createFeather = function(xpos, ypos, xvel, yvel) {
     myFeather.body.velocity.x = xvel;
     myFeather.body.velocity.y = yvel;
     myFeather.body.collideWorldBounds = false;
+    myFeather.events.onOutOfBounds.add(goodbye, this);
+}
+
+createGraviton = function(passedStrength, xpos, ypos, xvel, yvel) {
+    var myGraviton = topPointer.gravitons.create(xpos, ypos, 'graviton');
+    myGraviton.body.velocity.x = xvel;
+    myGraviton.body.velocity.y = yvel;
+    myGraviton.body.collideWorldBounds = false;
+    myGraviton.strength = passedStrength;
+    myGraviton.alpha = 0
+    myGraviton.checkWorldBounds = true;
+    myGraviton.events.onOutOfBounds.add(goodbye, this);
+}
+
+goodbye = function (object) {
+    console.log('Killed object');
+    object.kill();
 }
 
 recoil = function (player) {
@@ -135,7 +177,24 @@ coalesce = function (body1, body2) {
       body1.body.scaleFactor = chickenSize * Math.sqrt(body1.body.mass) * body1.body.coreCollapse;
       body1.scale.set(body1.body.scaleFactor, body1.body.scaleFactor)
       body2.kill();
-      addStrain();
+      collisionPoint = new Phaser.Point(body1.x, body1.y)
+      collisionStrength = 10000
+      console.log('Collision at '+ body1.x)
+      for (i = 0; i < 40; i++) {
+          angle1 = Math.random() * 2 * Math.PI;
+          createGraviton(Math.sqrt(body1.body.mass)/100, body1.x-128, body1.y-128, speedOfGraviton*Math.cos(angle1), speedOfGraviton*Math.sin(angle1));
+      }
+                angle1 = Math.random() * 2 * Math.PI
+                angle2 = Math.random() * 2 * Math.PI
+                angle3 = Math.random() * 2 * Math.PI
+                angle4 = Math.random() * 2 * Math.PI
+                angle5 = Math.random() * 2 * Math.PI
+                createEgg(body1.x, body1.y, 100*Math.cos(angle1), 100*Math.sin(angle1));
+                createFeather(body1.x, body1.y, 200*Math.cos(angle2), 200*Math.sin(angle2));
+                createFeather(body1.x, body1.y, 200*Math.cos(angle3), 200*Math.sin(angle3));
+                createFeather(body1.x, body1.y, 200*Math.cos(angle4), 200*Math.sin(angle4));
+                createFeather(body1.x, body1.y, 200*Math.cos(angle5), 200*Math.sin(angle5));
+      //addStrain(collisionPoint, collisionStrength);
   }
 }
 
@@ -189,6 +248,7 @@ gravitate = function(chickens, blackHoles) {
     var game = topPointer.game;
     try {
         chickens.forEachAlive(function(chicken1) {
+//            chicken1.anchor.setTo(0.5, 0.5);// = .5;
             var acceleration = new Phaser.Point(0, 0);
             chickens.forEachAlive(function(chicken2) {
                 if (chicken1 != chicken2) {
