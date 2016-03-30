@@ -1,58 +1,76 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
-	<meta charset="UTF-8" />
-    <title>Chickens in Space</title>
-
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="js/jquery.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/phaser.min.js"></script>
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Chickens In Space</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="chrome=1, IE=9">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="HandheldFriendly" content="true" />
+	<meta name="robots" content="noindex,nofollow" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta name="apple-mobile-web-app-title" content="Phaser App">
+	<meta name="viewport" content="initial-scale=1 maximum-scale=1 user-scalable=0 minimal-ui" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<!-- non-retina iPhone pre iOS 7 -->
+	<link rel="apple-touch-icon" sizes="57x57" href="icons/app_icon_57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="icons/app_icon_60x60.png">
+	<!-- non-retina iPad pre iOS 7 -->
+	<link rel="apple-touch-icon" sizes="72x72" href="icons/app_icon_72x72.png">
+	<!-- non-retina iPad iOS 7 -->
+	<link rel="apple-touch-icon" sizes="76x76" href="icons/app_icon_76x76.png">
+	<!-- retina iPhone pre iOS 7 -->
+	<link rel="apple-touch-icon" sizes="114x114" href="icons/app_icon_114x114.png">
+	<!-- retina iPhone iOS 7 -->
+	<link rel="apple-touch-icon" sizes="120x120" href="icons/app_icon_120x120.png">
+	<!-- retina iPad pre iOS 7 -->
+	<link rel="apple-touch-icon" sizes="144x144" href="icons/app_icon_144x144.png">
+	<!-- retina iPad iOS 7 -->
+	<link rel="apple-touch-icon" sizes="152x152" href="icons/app_icon_152x152.png">
+	<link rel="apple-touch-icon" sizes="256x256" href="icons/app_icon_256x256.png">
+	<link rel="apple-touch-icon" sizes="512x512" href="icons/app_icon_512x512.png">
+	<link rel="apple-touch-icon" sizes="1024x1024" href="icons/app_icon_1024x1024.png">
+	<link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8" />
+	<script src="js/phaser.min.js"></script>
+	<script src="js/jquery.min.js"></script>
+    <script src="src/game-behaviors.js"></script>
+	<script src="src/Boot.js"></script>
+	<script src="src/Preloader.js"></script>
+	<script src="src/Instructions.js"></script>
+	<script src="src/MainMenu.js"></script>
+    <script src="src/Game.js"></script> 
+    <!--	<script src="cis-game.js"></script> -->
 </head>
 <body>
 
-    <div class="col-md-6 col-md-offset-3">
-        <div class="page-header">
-            <h1>Chickens in Space</h1>
-        </div>
-    </div>
-    <div align="center">
+	<div id="game"></div>
+	<div id="orientation"></div>
 
-        <iframe src="cis-game.html" name="chickensinspace"    width="800" height="600" frameborder="0" scrolling="no">   <p>Your browser does not support iframes.</p> ></iframe>
+<script type="text/javascript">
 
-    </div>
-    <div class="col-md-6 col-md-offset-3">
-        <div class="panel panel-default">
-            <div class="panel panel-heading">
-                <h4>About</h4>
-            </div>
-            <div class="panel-body">
-                <p>
-                <i>Developed by Jonathan Wheeler, February-March  2016. Use your mouse to aim and fire chickens out of your rocket.</i>
+(function () {
 
-                </p>
-                <p>
-                Imagine if you had the super power to create chickens out of nothing? Or imagine if you had a magical chest that everytime you reached into it, there was a live chicken inside of it? Infinite food supply? Yes. Infinite supply of annoying clucking noises? Yes. But perhaps the best use of this super power is to overcome limitations of the rocket equation.
-                </p>
-                <p>
-                You see, if you want to move at point c, you need to have fuel at point c to burn. In order to burn it at point c, you need to carry the fuel to point c from point b. This means that at point b, you needed to burn fuel to carry your ship an dyour fuel to point c. The more fuel you need at point c, the more fuel you need to burn at point b. But in order to burn fuel at point b, you needed to carry that fuel from point a. The more fuel you want to burn at point b, the more you needed to burn at point a to carry all that fuel over to point b. Confused yet? That's okay. Just remember, <b>the get thrust you want at a given location, you need exponentially larger amounts of thrust at earlier locations to move the fuel for subsequent accelerations.</b>
-                </p>
-                <p>
-                This is because you need to conserve mass. But, if you had a magic box that created <strike>mass</strike> chickens, you could get around this limitation, and accelerate any way you jolly well please.
-                </p>
-                <p>That is the fundamental concept of Chickens in Space. Keep in mind that chickens are not pleased to be in the 3K vacuum of space, and when they glob together due to gravity (as they eventually will) they will grow angry at you. If they collapse into a black hole, they will supernovae out <strike>radiation</strike> feathers and <strike>heavy metals</strike> eggs to get their chicken revenge!
-                <hr>
-                <p>
-                  TODO:
-                </p>
-                <ul>
-                    <li> Make chickens collapse into black holes
-                    <li> Make playing window pan
-                    <li> Introduce multiplayer component
-                </ul>
-                </p>
-            </div>
-        </div>
-    </div>
+	//	Create your Phaser game and inject it into the game div.
+	//	We did it in a window.onload event, but you can do it anywhere (requireJS load, anonymous function, jQuery dom ready, - whatever floats your boat)
+	//	We're using a game size of 1024 x 768 here, but you can use whatever you feel makes sense for your game of course.
+//	var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game');// Too small
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+	var game = new Phaser.Game(width, height, Phaser.AUTO, 'game');
+
+	//	Add the States your game has.
+	//	You don't have to do this in the html, it could be done in your Boot state too, but for simplicity I'll keep it here.
+	game.state.add('Boot', BasicGame.Boot);
+	game.state.add('Preloader', BasicGame.Preloader);
+	game.state.add('MainMenu', BasicGame.MainMenu);
+	game.state.add('Game', BasicGame.Game);
+	game.state.add('Instructions', BasicGame.Instructions);
+
+	//	Now start the Boot state.
+	game.state.start('Boot');
+
+})();
+</script>
+
 </body>
 </html>
