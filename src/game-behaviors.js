@@ -47,7 +47,7 @@ addStrain = function(collisionPoint, collisionStrength) {
 }
 
 addStrain2 = function(strainedObject, graviton) {
-    strainedObject.body.strainAmplitudeGain = graviton.strength
+    strainedObject.body.strainAmplitudeGain = graviton.strength/10
 }
 
 strainObjects = function() {
@@ -193,8 +193,9 @@ coalesce = function (body1, body2) {
       body2.kill();
       collisionPoint = new Phaser.Point(body1.x, body1.y)
       collisionStrength = 10000
-      for (i = 0; i < 40; i++) {
-          angle1 = Math.random() * 2 * Math.PI;
+      numGraviton = 40;
+      for (i = 0; i < numGraviton; i++) {
+          angle1 = 2 * i * Math.PI/numGraviton;
           createGraviton(Math.sqrt(body1.body.mass)/100, body1.x-128, body1.y-128, speedOfGraviton*Math.cos(angle1), speedOfGraviton*Math.sin(angle1));
       }
       for (i = 0; i < body1.body.mass; i++) {
@@ -313,6 +314,9 @@ gravitate = function(chickens, blackHoles) {
     var game = topPointer.game;
     try {
         chickens.forEachAlive(function(chicken1) {
+            if (chicken1.body.velocity.x > 1000 || chicken1.body.velocity.y>1000) {
+                chicken1.kill();
+            } else {
 //            chicken1.anchor.setTo(0.5, 0.5);// = .5;
             var acceleration = new Phaser.Point(0, 0);
             chickens.forEachAlive(function(chicken2) {
@@ -337,6 +341,7 @@ gravitate = function(chickens, blackHoles) {
            chicken1.body.acceleration = acceleration;
            chicken1.body.velocity.x *= dragCoefficient;
            chicken1.body.velocity.y *= dragCoefficient;
+            }
         })
     } catch (err) {
         console.log('Gravity problems');
