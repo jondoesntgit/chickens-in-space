@@ -24,8 +24,8 @@ BasicGame.Boot.prototype = {
         if (this.game.device.desktop)
         {
             this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            // Gave me errors
-            //this.scale.setMinMax(480, 260, 1024, 768);
+
+            // Set some boundaries for the window
             this.scale.minWidth = 480;
             this.scale.minHeight = 260;
             this.scale.maxWidth = 1024;
@@ -36,8 +36,8 @@ BasicGame.Boot.prototype = {
         else
         {
             this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            // Gave me errors
-            //this.scale.setMinMax(480, 260, 1024, 768);
+
+            // Set some boundaries for the window
             this.scale.minWidth = 480;
             this.scale.minHeight = 260;
             this.scale.maxWidth = 1024;
@@ -55,7 +55,6 @@ BasicGame.Boot.prototype = {
     preload: function () {
 
         //  Here we load the assets required for our preloader (in this case a background and a loading bar)
-//        this.load.image('preloaderBackground', 'images/preloader_background.jpg');
         this.load.image('preloaderBar', 'images/preloader_bar.png');
         this.load.image('noButton', 'images/no-80-40.png');
         this.load.image('yesButton', 'images/yes-80-40.png');
@@ -67,10 +66,12 @@ BasicGame.Boot.prototype = {
        var topPointer = this;
        var height = window.innerHeight;
        var width = window.innerWidth;
+
        yesButtonClick = function (){
            loadMusic = true
            topPointer.state.start('Preloader');
        }
+       
        noButtonClick = function () {
            loadMusic = false
            topPointer.state.start('Preloader');

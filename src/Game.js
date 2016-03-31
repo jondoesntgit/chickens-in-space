@@ -115,6 +115,7 @@ BasicGame.Game.prototype = {
 
         this.player.rotation = this.game.physics.arcade.angleToPointer(this.player) - Math.PI/2; // Phaser recons angle from vertical, not from horizontal.
 
+        // What happens when objects collide?
         this.game.physics.arcade.overlap(this.chickens, this.chickens, coalesce, null, this);
         this.game.physics.arcade.overlap(this.player, this.chickens, destroyPlayer);
         this.game.physics.arcade.overlap(this.player, this.blackHoles, destroyPlayer);
@@ -128,7 +129,7 @@ BasicGame.Game.prototype = {
         strainObjects();
 
         this.game.debug.text('Score: ' + this.score, 20, 20)
-if (timer.running) {
+        if (timer.running) {
             this.game.debug.text("Time Remaining: " +(this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000))), 20, 40);
         }
         else {
