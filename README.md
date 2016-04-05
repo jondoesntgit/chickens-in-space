@@ -4,4 +4,4 @@ As part of my honors thesis, I created an educational game to give students a ch
 
 The game is created using the Phaser.io framework. The game can be played on a browser such as Chrome by loading the index.html file.
 
-A live example can be viewed at tiny.cc/chickens-in-space
+A live example can be viewed at [http://labs.jamwheeler.com/chickens-in-space]
